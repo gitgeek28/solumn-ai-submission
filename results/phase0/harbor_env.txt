@@ -1,0 +1,6 @@
+harbor 0.24.0  (installed with: uv tool install harbor)
+docker: Docker version 29.8.1, build 4a63305d74
+compose: Docker Compose version 5.5.1
+runtime: colima colima version 0.10.3 (vz, 4 cpu, 5 GiB)
+host: Darwin arm64, Apple M1, 8 GB
+python (verifier/agent images): python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce

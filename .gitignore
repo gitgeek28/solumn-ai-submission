@@ -1,0 +1,13 @@
+.env
+.env.*
+jobs/
+results/rollouts/**/raw/
+__pycache__/
+*.pyc
+*.db
+*.sqlite
+.DS_Store
+node_modules/
+dist/
+*.tar.gz
+.venv/

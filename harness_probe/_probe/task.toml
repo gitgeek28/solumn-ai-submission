@@ -1,0 +1,36 @@
+schema_version = "1.4"
+# Top-level, ABOVE every [section]: TOML would otherwise file it under the previous table.
+artifacts = [
+  "/app/work",
+  { source = "/tmp/ledger_snapshot", service = "ledger" },
+]
+
+[task]
+name = "solumn/harness-probe"
+version = "1.0.0"
+description = "Phase 0 probe: artifact transfer, sidecar collect-after-stop, verifier self-service, fail-closed grading."
+
+[metadata]
+family = "harness-probe"
+purpose = "harness-probe"
+
+[environment]
+network_mode = "no-network"
+workdir = "/app"
+build_timeout_sec = 900
+
+[agent]
+timeout_sec = 300
+
+[verifier]
+environment_mode = "separate"
+timeout_sec = 300
+
+[verifier.environment]
+network_mode = "no-network"
+build_timeout_sec = 900
+
+[[verifier.collect]]
+service = "ledger"
+command = "mkdir -p /tmp/ledger_snapshot && cp /var/ledger/calls.log /var/ledger/agent_secret /tmp/ledger_snapshot/ 2>/dev/null; ls /tmp/ledger_snapshot"
+timeout_sec = 60

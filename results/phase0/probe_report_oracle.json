@@ -1,0 +1,18 @@
+{
+  "artifact_state": "PRESENT_CORRECT",
+  "agent_phase_audit_lines_with_secret": 1,
+  "agent_phase_secret_prefix": "AGENTSECRET_d857648c",
+  "verifier_self_service": "reached own 127.0.0.1:8765 (HTTP 200)",
+  "verifier_reaches_agent_ledger": "no (URLError)",
+  "verifier_egress": "blocked (RemoteDisconnected)",
+  "agent_network_facts": [
+    "ledger-dns=blocked(URLError)",
+    "egress=blocked(RemoteDisconnected)"
+  ],
+  "reward_written": 1,
+  "vdir_listing": [
+    "result.json",
+    "reward.txt",
+    "test-stdout.txt"
+  ]
+}

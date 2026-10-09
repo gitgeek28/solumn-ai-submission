@@ -1,0 +1,4 @@
+model: gpt-5.5
+choices: 1
+reply: Hi! I’m doing well, thanks for asking. How can I help you today?
+usage: {'prompt_tokens': 10, 'completion_tokens': 21, 'total_tokens': 31, 'prompt_tokens_details': {'cached_tokens': 0, 'audio_tokens': 0}, 'completion_tokens_details': {'reasoning_tokens': 0, 'audio_tokens': 0, 'accepted_prediction_tokens': 0, 'rejected_prediction_tokens': 0}}

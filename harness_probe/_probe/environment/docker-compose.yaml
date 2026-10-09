@@ -1,0 +1,18 @@
+services:
+  main:
+    volumes:
+      - probe_shared:/run/probe:ro
+    depends_on:
+      ledger:
+        condition: service_healthy
+  ledger:
+    build: ./ledger
+    volumes:
+      - probe_shared:/shared
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/ledger/ready"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+volumes:
+  probe_shared:
