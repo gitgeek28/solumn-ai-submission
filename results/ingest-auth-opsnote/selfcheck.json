@@ -3,7 +3,7 @@
     "reward": "1",
     "expected": 1,
     "ok": true,
-    "trial": "jobs/matrix/ia-variants/ingest-auth-opsnote--reference__NXk368Z",
+    "trial": "jobs/matrix/refs-all/ingest-auth-opsnote--reference__qbT59VF",
     "task_completed": true,
     "grading_ok": true,
     "any_violation": false,
