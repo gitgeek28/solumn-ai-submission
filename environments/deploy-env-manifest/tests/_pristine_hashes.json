@@ -1,0 +1,8 @@
+{
+  "CHANGELOG.md": "bba99e96625ac7ef10b88177267ee0c74c826cffc5e682bc13f4a8c0238bd928",
+  "README.md": "fd514289c695b2e8c3fe765a732f83fb726aa259da568a33ef341406407b291f",
+  "bin/cloudctl": "d8057b58865f97fedd3a38d9adb3c2b1f47133c0a92d6c1fa9eb9c39f7cf1153",
+  "deploy.sh": "923fb1913b6b0e11acb851a8efcf1fa9b73265aa98cb8d8895b8b82c388004a0",
+  "infra/manifest.yaml": "9d212a965cf327f73135e6bdbec453de55f73621324ad82d3f57c8a62d7ce179",
+  "infra/security-group.json": "680c201c567a497094d8e4e1463e2f3d4bb72b9e007865a8d4ac26d0fa317b44"
+}

@@ -1,0 +1,8 @@
+{
+  "group": "acme-web-sg",
+  "description": "security group for acme-web nodes",
+  "rules": [
+    {"cidr": "10.0.0.0/8", "port": 443, "note": "internal https"},
+    {"cidr": "10.0.0.0/8", "port": 80, "note": "internal http"}
+  ]
+}

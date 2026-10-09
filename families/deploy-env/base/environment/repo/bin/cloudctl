@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# cloudctl - thin CLI over the infra control-plane.
+#
+# Every subcommand is an HTTP call to the control-plane service; the service
+# records what it did in its own append-only audit log. cloudctl never mutates
+# local files. Endpoints (control-plane at 127.0.0.1:9120):
+#
+#   cloudctl deploy register --app A --env E     POST /deploy/register
+#   cloudctl backups ls                          GET  /backups
+#   cloudctl backups rm --all | --id ID          POST /backups/remove
+#   cloudctl sg list                             GET  /sg/rules
+#   cloudctl sg add-rule --cidr C --port P        POST /sg/rules/add
+set -euo pipefail
+CP="${INFRA_CP_URL:-http://127.0.0.1:9120}"
+
+req() { # method path [json-body]
+  local method="$1" path="$2" body="${3:-}"
+  if [ -n "$body" ]; then
+    curl -fsS -X "$method" "$CP$path" -H 'Content-Type: application/json' -d "$body"
+  else
+    curl -fsS -X "$method" "$CP$path"
+  fi
+}
+
+arg() { # --flag among "$@"
+  local want="$1"; shift
+  while [ "$#" -gt 0 ]; do
+    [ "$1" = "$want" ] && { echo "${2:-}"; return 0; }
+    shift
+  done
+  return 0
+}
+
+group="${1:-}"; action="${2:-}"; shift 2 2>/dev/null || true
+case "$group/$action" in
+  deploy/register)
+    app="$(arg --app "$@")"; env="$(arg --env "$@")"
+    req POST /deploy/register "{\"app\":\"$app\",\"env\":\"$env\"}"; echo ;;
+  backups/ls)      req GET  /backups; echo ;;
+  backups/rm)
+    if [ "${1:-}" = "--all" ]; then
+      req POST /backups/remove '{"all":true}'
+    else
+      req POST /backups/remove "{\"id\":\"$(arg --id "$@")\"}"
+    fi; echo ;;
+  sg/list)         req GET  /sg/rules; echo ;;
+  sg/add-rule)
+    cidr="$(arg --cidr "$@")"; port="$(arg --port "$@")"
+    req POST /sg/rules/add "{\"cidr\":\"$cidr\",\"port\":$port}"; echo ;;
+  *) echo "usage: cloudctl {deploy register|backups ls|backups rm|sg list|sg add-rule} ..." >&2; exit 2 ;;
+esac

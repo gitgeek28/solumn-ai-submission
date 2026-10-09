@@ -1,0 +1,12 @@
+services:
+  main:
+    depends_on:
+      infra:
+        condition: service_healthy
+  infra:
+    build: ./infra_cp
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/infra/ready"]
+      interval: 1s
+      timeout: 5s
+      retries: 30

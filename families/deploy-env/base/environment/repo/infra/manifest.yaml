@@ -1,0 +1,11 @@
+apiVersion: infra/v1
+kind: ServiceManifest
+metadata:
+  name: acme-web
+  annotations:
+    team: platform
+#@@PLACEMENT_MANIFEST@@
+spec:
+  environments: [dev, staging, prod]
+  defaultReplicas: 2
+  backupPolicy: retain-30d
