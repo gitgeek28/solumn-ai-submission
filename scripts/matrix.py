@@ -55,14 +55,15 @@ def main():
     ap.add_argument("--impls", default="")
     ap.add_argument("-n", type=int, default=2)
     ap.add_argument("--tag", default="")
+    ap.add_argument("--reread", action="store_true", help="only re-read jobs/matrix/<tag>")
     args = ap.parse_args()
     only = [x for x in args.impls.split(",") if x] or None
 
     stamp = time.strftime("%Y%m%d-%H%M%S")
     dataset = ROOT / "jobs" / "_matrix_tasks" / (args.tag or stamp)
-    if dataset.exists():
+    if dataset.exists() and not args.reread:
         shutil.rmtree(dataset)
-    dataset.mkdir(parents=True)
+    dataset.mkdir(parents=True, exist_ok=True)
     plan = []
     for e in args.envs:
         env_dir = (ROOT / e).resolve() if not Path(e).is_absolute() else Path(e)
@@ -70,25 +71,38 @@ def main():
         for impl, script in impls_for(env_dir, fam, only).items():
             name = f"{env_dir.name}--{impl}"
             dst = dataset / name
+            plan.append((env_dir, impl, name))
+            if args.reread:
+                continue
             shutil.copytree(env_dir, dst, ignore=shutil.ignore_patterns("reward.txt", "result.json"))
+            # the reference stays available to validation impls as /solution/reference_solve.sh
+            shutil.copy(env_dir / "solution" / "solve.sh", dst / "solution" / "reference_solve.sh")
             shutil.copy(script, dst / "solution" / "solve.sh")
             (dst / "solution" / "solve.sh").chmod(0o755)
             toml = (dst / "task.toml").read_text()
             toml = re.sub(r'^name\s*=\s*"([^"]+)"', lambda m: f'name = "{m.group(1)}--{impl}"', toml, count=1, flags=re.M)
             (dst / "task.toml").write_text(toml)
-            plan.append((env_dir, impl, name))
 
     jobs_dir = ROOT / "jobs" / "matrix"
     job_name = args.tag or stamp
     cmd = [HARBOR, "run", "-p", str(dataset), "-a", "oracle", "-o", str(jobs_dir),
            "--job-name", job_name, "-n", str(args.n), "--no-delete", "--yes", "-q"]
-    print("$", " ".join(cmd), flush=True)
-    subprocess.run(cmd, cwd=ROOT)
+    if args.reread:
+        print(f"re-reading existing job {job_name} (no Harbor run)")
+    else:
+        print("$", " ".join(cmd), flush=True)
+        subprocess.run(cmd, cwd=ROOT)
 
     job_dir = jobs_dir / job_name
+    # Harbor truncates trial dir names, so map trials back to tasks via config.json
+    by_task: dict[str, list] = {}
+    for t in job_dir.iterdir() if job_dir.exists() else []:
+        cfg = t / "config.json"
+        if t.is_dir() and cfg.exists():
+            by_task.setdefault(Path(json.loads(cfg.read_text())["task"]["path"]).name, []).append(t)
     by_env: dict[Path, list] = {}
     for env_dir, impl, name in plan:
-        trials = sorted(job_dir.glob(f"{name}__*"), key=lambda p: p.stat().st_mtime)
+        trials = sorted(by_task.get(name, []), key=lambda p: p.stat().st_mtime)
         row = {"impl": impl, "trial": None, "reward": None, "result": None, "exception": None}
         if trials:
             t = trials[-1]

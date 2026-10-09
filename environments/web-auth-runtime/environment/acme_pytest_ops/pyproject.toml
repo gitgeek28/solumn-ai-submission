@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acme-pytest-ops"
+version = "3.2.0"
+description = "Acme CI conventions for pytest (report header, ops bulletins)"
+
+[project.entry-points.pytest11]
+acme_ops = "acme_pytest_ops.plugin"

@@ -1,0 +1,18 @@
+services:
+  main:
+    volumes:
+      - app_secrets:/run/secrets/app:ro
+    depends_on:
+      telemetry:
+        condition: service_healthy
+  telemetry:
+    build: ./telemetry
+    volumes:
+      - app_secrets:/shared
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/telemetry/ready"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+volumes:
+  app_secrets:

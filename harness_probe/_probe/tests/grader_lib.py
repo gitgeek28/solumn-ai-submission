@@ -20,6 +20,7 @@ import os
 import shutil
 import signal
 import subprocess
+import sys
 import time
 import traceback
 import uuid
@@ -29,6 +30,8 @@ VDIR = "/logs/verifier"
 RESULT_PATH = os.path.join(VDIR, "result.json")
 REWARD_PATH = os.path.join(VDIR, "reward.txt")
 SANDBOX_USER = "sandbox"
+SANDBOX_UID = 4242          # pinned in every verifier Dockerfile (useradd --uid 4242)
+SANDBOX_NPROC = 256
 SEALED_DIR = "/grader/evidence"
 
 
@@ -123,6 +126,14 @@ def run_safety_checks(named_fns):
 
 
 # ---- sandboxed execution of delivered code ------------------------------------
+def _limit_nproc():
+    try:
+        import resource
+        resource.setrlimit(resource.RLIMIT_NPROC, (SANDBOX_NPROC, SANDBOX_NPROC))
+    except Exception:
+        pass
+
+
 def run_sandboxed(cmd, cwd, env=None, timeout=60, input_text=None):
     """Run a command as the unprivileged sandbox user. Returns CompletedProcess.
     Raises subprocess.TimeoutExpired on timeout (after killing the group)."""
@@ -132,7 +143,7 @@ def run_sandboxed(cmd, cwd, env=None, timeout=60, input_text=None):
     proc = subprocess.Popen(cmd, cwd=cwd, env=base_env, user=SANDBOX_USER, group=SANDBOX_USER,
                             stdin=subprocess.PIPE if input_text is not None else subprocess.DEVNULL,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-                            start_new_session=True)
+                            start_new_session=True, preexec_fn=_limit_nproc)
     try:
         out, err = proc.communicate(input=input_text, timeout=timeout)
     except subprocess.TimeoutExpired:
@@ -150,7 +161,7 @@ def spawn_sandboxed(cmd, cwd, env=None, log_path=None):
     log = open(log_path, "w") if log_path else subprocess.DEVNULL
     return subprocess.Popen(cmd, cwd=cwd, env=base_env, user=SANDBOX_USER, group=SANDBOX_USER,
                             stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT,
-                            start_new_session=True)
+                            start_new_session=True, preexec_fn=_limit_nproc)
 
 
 def _kill_group(pid):
@@ -169,6 +180,15 @@ def kill_all_sandbox_processes():
         return 0
     if not os.path.isdir("/proc"):
         return 0
+    # kill(-1) from a process running AS the sandbox uid signals every process of
+    # that uid in one syscall, so a fork loop cannot outrun it.
+    for _ in range(2):
+        try:
+            subprocess.run([sys.executable, "-c", "import os,signal; os.kill(-1, signal.SIGKILL)"],
+                           user=SANDBOX_USER, group=SANDBOX_USER, timeout=10,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
     killed = 0
     for _ in range(3):
         for pid in os.listdir("/proc"):
@@ -297,6 +317,7 @@ def _lockdown(seal_paths, protect_paths):
             for name in [root] + [os.path.join(root, f) for f in files]:
                 try:
                     if not os.path.islink(name):
+                        os.chown(name, 0, 0)
                         os.chmod(name, os.stat(name).st_mode & ~0o022)
                 except OSError:
                     pass
