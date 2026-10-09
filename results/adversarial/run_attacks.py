@@ -57,6 +57,11 @@ def main():
     for s in scripts:
         dst = ds / f"{env.name}--{s.stem}"
         shutil.copytree(env, dst, ignore=shutil.ignore_patterns("reward.txt", "result.json"))
+        # keep the env's reference solution available to attack impls (same as matrix.py)
+        ref = dst / "solution" / "solve.sh"
+        if ref.exists():
+            shutil.copy(ref, dst / "solution" / "reference_solve.sh")
+            (dst / "solution" / "reference_solve.sh").chmod(0o755)
         shutil.copy(s, dst / "solution" / "solve.sh")
         (dst / "solution" / "solve.sh").chmod(0o755)
         for h in helpers:

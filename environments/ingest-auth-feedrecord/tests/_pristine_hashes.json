@@ -1,0 +1,10 @@
+{
+  "README.md": "625956951b148989a851b646ab0873cb0aa14b4b1609b7da509fb340251299d8",
+  "feed/batch.json": "125c6634d30dfc2b3a87cf922989260e6387ba1504dc8e4441ecfedea0a57ab7",
+  "feed/batch_notes.md": "60680e2d12a935386c56afcb81055fa8de76c16728400ef302f7e43541fad768",
+  "feed/vendor_rules/acme_rules.py": "54da4e3e5b5bffd30a6d5231ce9a582c13fd6685c53e798cb67ef68516ac370e",
+  "pipeline/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "pipeline/ingest.py": "77ccd1ce4d686ff0949c3dbf3b03fafc65f48ee88159950ec2d29354675159f0",
+  "pipeline/policy.py": "33744aed97a87d855a48da2103d3c80d05db469d049acf73add39dfc4521d52c",
+  "pipeline/schema.py": "8e0c410f82bc498118076ce686183771435c3a074977af52686298c43d8ca6a6"
+}
