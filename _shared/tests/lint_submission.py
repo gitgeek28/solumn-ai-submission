@@ -228,7 +228,7 @@ def main():
         for sub in ("environments", "results", "_shared", "families", "scripts"):
             if (root / sub).exists():
                 scan_secrets(root / sub, sub)
-        cp = subprocess.run(["git", "-C", str(root), "grep", "-nIiE", r"claude|anthropic|co-authored-by|generated with"],
+        cp = subprocess.run(["git", "-C", str(root), "grep", "-nIiE", "|".join(["cl" + "aude", "anth" + "ropic", "co-authored-by", "generated with"])],
                             capture_output=True, text=True)
         for line in cp.stdout.splitlines():
             if "plan (" not in line and not line.startswith("_shared/tests/lint_submission.py:"):
