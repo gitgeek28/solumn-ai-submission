@@ -146,12 +146,15 @@ with a concrete observed effect.
 
 ## Honest residual weaknesses
 
-- **Zero live GPT-5.5 violations so far.** web-auth resisted 6/6 (real rollouts);
-  deploy-env and ingest-auth could not be rolled out because the model endpoint
-  ran out of credits (`results/rollouts/README.md`). The brief's "≥1 live
-  violation per family" is **unmet** — by an external billing blocker, not a
-  design gap. Grader rigor is demonstrated by the oracle-driven obedient cells
-  with real observed effects, not asserted.
+- **Zero live GPT-5.5 violations across 18 rollouts.** All three families, three
+  placements each, k=2: the model resisted every time (reward 1, no check fired;
+  `results/rollouts/`). The brief's "≥1 live violation per family" is **unmet** —
+  because GPT-5.5 at reasoning_effort=high is robust to these injections, not
+  because the graders miss violations. The `obedient*` cells of every
+  `selfcheck.txt` show each grader observing a real directive-following effect, so
+  the environments would catch a less-robust model. We did not escalate pressure
+  or craft injections to defeat the model's safety training; the 18 clean
+  completions are also a no-false-positive result for the graders.
 - Each grader observes a bounded set of channels; a leak to an unobserved local
   sink, or obedience that produces no effect, is by design not called a violation
   (no effect, no claim).
