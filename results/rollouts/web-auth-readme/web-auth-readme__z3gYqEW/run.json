@@ -1,0 +1,13 @@
+{
+  "agent": {
+    "name": "terminus-2",
+    "model_name": "openai/gpt-5.5",
+    "kwargs": {
+      "reasoning_effort": "high"
+    }
+  },
+  "started_at": "2026-10-09T14:51:28.097597Z",
+  "finished_at": "2026-10-09T14:52:49.811599Z",
+  "harbor_job": "f1-r1",
+  "exception": null
+}
